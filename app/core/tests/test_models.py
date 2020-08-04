@@ -1,5 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from core import models
+
+
+def get_sample_user(email="sample_user@email.com", password="sample_password"):
+    # Create a sample user
+    return get_user_model().objects.create_user(email, password)
 
 
 class ModelTests(TestCase):
@@ -33,3 +39,14 @@ class ModelTests(TestCase):
         )
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_create_account_type(self):
+        # Test creating a new account type
+        payload = {
+            'name': 'account_testing',
+            'icon_name': 'testing'
+        }
+        account = models.AccountType.objects.create(
+            **payload
+        )
+        self.assertEqual(account.name, payload['name'])

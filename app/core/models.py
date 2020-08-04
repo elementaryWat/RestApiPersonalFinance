@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
     PermissionsMixin
+from django.conf import settings
 
 
 class UserManager(BaseUserManager):
@@ -30,3 +31,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
     USERNAME_FIELD = "email"
+
+
+class AccountType(models.Model):
+    # Model for defining the Transactions Account Type e.g Wallet, Savings
+    name = models.CharField(max_length=50)
+    icon_name = models.CharField(max_length=50)
+
+
+class Account(models.Model):
+    # Model for creating a user's transactions account
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=512)
+    account_type = models.ForeignKey(
+        AccountType,
+        on_delete=models.CASCADE
+    )
+    user = settings.AUTH_USER_MODEL
