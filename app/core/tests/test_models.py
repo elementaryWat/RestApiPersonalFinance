@@ -8,6 +8,12 @@ def get_sample_user(email="sample_user@email.com", password="sample_password"):
     return get_user_model().objects.create_user(email, password)
 
 
+def create_sample_account_type(payload={'name': 'account_testing', 'icon_name': 'testing'}):
+    return models.AccountType.objects.create(
+        **payload
+    )
+
+
 class ModelTests(TestCase):
     def test_create_user_with_email_successful(self):
         # Test creating a new user with an email is successful
@@ -46,7 +52,24 @@ class ModelTests(TestCase):
             'name': 'account_testing',
             'icon_name': 'testing'
         }
-        account = models.AccountType.objects.create(
+        account_type = create_sample_account_type(payload)
+        self.assertEqual(account_type.name, payload['name'])
+        self.assertEqual(account_type.icon_name, payload['icon_name'])
+
+    def test_create_account(self):
+        # Test creating a new account type
+        account_type = create_sample_account_type()
+        user = get_sample_user()
+        payload = {
+            'name': 'Transactions Account',
+            'description': 'Some description',
+            'account_type': account_type,
+            'user': user
+        }
+        account = models.Account.objects.create(
             **payload
         )
         self.assertEqual(account.name, payload['name'])
+        self.assertEqual(account.description, payload['description'])
+        self.assertEqual(account.account_type, payload['account_type'])
+        self.assertEqual(account.user, payload['user'])

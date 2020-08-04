@@ -36,7 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class AccountType(models.Model):
     # Model for defining the Transactions Account Type e.g Wallet, Savings
     name = models.CharField(max_length=50)
-    icon_name = models.CharField(max_length=50)
+    icon_name = models.CharField(max_length=50, blank=True)
 
 
 class Account(models.Model):
@@ -47,4 +47,7 @@ class Account(models.Model):
         AccountType,
         on_delete=models.CASCADE
     )
-    user = settings.AUTH_USER_MODEL
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
