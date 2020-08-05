@@ -50,9 +50,10 @@ class ModelTests(TestCase):
         # Test creating a new account type
         payload = {
             'name': 'account_testing',
-            'icon_name': 'testing'
+            'icon_name': 'testing icon'
         }
         account_type = create_sample_account_type(payload)
+        self.assertEqual(str(account_type), payload['name'])
         self.assertEqual(account_type.name, payload['name'])
         self.assertEqual(account_type.icon_name, payload['icon_name'])
 
