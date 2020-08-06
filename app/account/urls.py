@@ -3,11 +3,10 @@ from account import views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register('account-type', views.AccountTypeViewSet)
-router.register('', views.AccountViewSet)
+router.register('account_type', views.AccountTypeViewSet,
+                basename="accounttype")
+router.register('', views.AccountViewSet, basename="accounts")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include((router.urls, 'account'))),
 ]
-
-app_name = 'account'
