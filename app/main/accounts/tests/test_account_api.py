@@ -73,8 +73,8 @@ class PrivateAccountApiTests(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], account1.name)
 
-    def test_create_valid_category_success(self):
-        # Test creating category with valid payload is successful
+    def test_create_valid_account_success(self):
+        # Test creating account with valid payload is successful
         account_type = create_sample_account_type()
         payload = {
             'name': "Account 1",
@@ -90,6 +90,18 @@ class PrivateAccountApiTests(TestCase):
             'name': "",
             'description': "",
             'account_type': "",
+        }
+
+        res = self.client.post(ACCOUNTS_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_not_create_account_with_wrong_account_type(self):
+        # Test not creating a category when the data is empty
+        WRONG_ACCOUNT_TYPE_ID = 5
+        payload = {
+            'name': "Account 1",
+            'description': "description 1",
+            'account_type': WRONG_ACCOUNT_TYPE_ID,
         }
 
         res = self.client.post(ACCOUNTS_URL, payload)
