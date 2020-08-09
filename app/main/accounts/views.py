@@ -1,6 +1,6 @@
 from rest_framework import viewsets, mixins
 
-from account.serializers import AccountTypeSerializer, AccountSerializer
+from main.accounts.serializers import AccountTypeSerializer, AccountSerializer
 from core.models import AccountType, Account
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated

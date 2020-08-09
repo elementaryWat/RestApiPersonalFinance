@@ -1,6 +1,8 @@
 from django.db import models
+from enum import Enum
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
     PermissionsMixin
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 
@@ -57,3 +59,21 @@ class Account(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TransactionCategory(models.Model):
+    # Model for creating a transacion Category
+    name = models.CharField(max_length=50)
+    icon_name = models.CharField(max_length=50, blank=True)
+    CATEGORY_TYPE_CHOICES = [
+        ('EX', _('Expense')),
+        ('IN', _('Income')),
+    ]
+    category_type = models.CharField(
+        max_length=5,
+        choices=CATEGORY_TYPE_CHOICES
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )

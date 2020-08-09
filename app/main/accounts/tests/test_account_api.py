@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 from core.models import Account, AccountType
-from account.serializers import AccountSerializer
+from main.accounts.serializers import AccountSerializer
 
 ACCOUNTS_URL = reverse('account:accounts-list')
 
