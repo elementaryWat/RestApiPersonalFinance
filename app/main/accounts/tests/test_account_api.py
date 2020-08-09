@@ -83,6 +83,7 @@ class PrivateAccountApiTests(TestCase):
         }
         res = self.client.post(ACCOUNTS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data['user'], self.user.id)
 
     def test_not_create_account_with_empty_data(self):
         # Test not creating a category when the data is empty

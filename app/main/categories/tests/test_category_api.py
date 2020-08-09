@@ -76,6 +76,18 @@ class PrivateAccountApiTests(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], category2.name)
 
+    def test_create_valid_account_success(self):
+        # Test creating category with valid payload is successful
+        payload = {
+            'name': "Investments",
+            'icon_name': "salary",
+            'category_type': "IN",
+        }
+
+        res = self.client.post(CATEGORIES_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.data['user'], self.user.id)
+
     def test_not_create_category_with_empty_data(self):
         # Test not creating a category when the data is empty
         payload = {
