@@ -20,3 +20,7 @@ class AccountViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Return objects for the current authenticated user only
         return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Adds the user logged into the Account
+        serializer.save(user=self.request.user)

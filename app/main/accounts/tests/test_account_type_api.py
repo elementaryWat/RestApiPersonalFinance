@@ -26,3 +26,8 @@ class PublicAccountTypeApiTests(TestCase):
             account_types, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serialized_account_types.data)
+    
+    def test_post_account_type_not_allowed(self):
+        # Test retrieving user profile for logged in user
+        res = self.client.post(ACCOUNT_TYPE_URL, {})
+        self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

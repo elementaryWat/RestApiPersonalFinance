@@ -10,6 +10,17 @@ from main.accounts.serializers import AccountSerializer
 ACCOUNTS_URL = reverse('accounts:accounts-list')
 
 
+def create_sample_account_type(payload={'name': 'account_testing', 'icon_name': 'testing'}):
+    return AccountType.objects.create(
+        **payload
+    )
+
+
+def get_sample_user(email="sample_user@email.com", password="sample_password"):
+    # Create a sample user
+    return get_user_model().objects.create_user(email, password)
+
+
 class PublicAccountApiTests(TestCase):
 
     def setUp(self):
@@ -34,8 +45,7 @@ class PrivateAccountApiTests(TestCase):
 
     def test_retrieve_account_list(self):
         # Test for showing created accounts
-        account_type = AccountType.objects.create(
-            name="Account Type", icon_name="icon")
+        account_type = create_sample_account_type()
         Account.objects.create(name="Account 1", description="description 1",
                                account_type=account_type, user=self.user)
         Account.objects.create(name="Account 2", description="description 2",
@@ -50,12 +60,8 @@ class PrivateAccountApiTests(TestCase):
 
     def test_retrieve_account_list_limited_to_user(self):
         # Test for showing created accounts for the logged in user
-        another_user = get_user_model().objects.create_user(
-            email="another@test.com",
-            password="test1234"
-        )
-        account_type = AccountType.objects.create(
-            name="Account Type", icon_name="icon")
+        another_user = get_sample_user()
+        account_type = create_sample_account_type()
         account1 = Account.objects.create(name="Account 1", description="description 1",
                                           account_type=account_type, user=self.user)
         Account.objects.create(name="Account 2", description="description 2",
@@ -66,3 +72,25 @@ class PrivateAccountApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], account1.name)
+
+    def test_create_valid_category_success(self):
+        # Test creating category with valid payload is successful
+        account_type = create_sample_account_type()
+        payload = {
+            'name': "Account 1",
+            'description': "description 1",
+            'account_type': account_type.id,
+        }
+        res = self.client.post(ACCOUNTS_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_not_create_account_with_empty_data(self):
+        # Test not creating a category when the data is empty
+        payload = {
+            'name': "",
+            'description': "",
+            'account_type': "",
+        }
+
+        res = self.client.post(ACCOUNTS_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
