@@ -7,7 +7,7 @@ from rest_framework import status
 from core.models import Account, AccountType
 from main.accounts.serializers import AccountSerializer
 
-ACCOUNTS_URL = reverse('account:accounts-list')
+ACCOUNTS_URL = reverse('accounts:accounts-list')
 
 
 class PublicAccountApiTests(TestCase):

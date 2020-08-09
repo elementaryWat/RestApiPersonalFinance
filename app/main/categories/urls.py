@@ -7,5 +7,5 @@ router.register('', views.TransactionCategoryViewSet,
                 basename="transaction_category")
 
 urlpatterns = [
-    path('', include((router.urls, 'transaction'))),
+    path('', include((router.urls, 'categories'))),
 ]

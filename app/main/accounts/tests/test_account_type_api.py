@@ -6,7 +6,7 @@ from rest_framework import status
 from core.models import AccountType
 from main.accounts.serializers import AccountTypeSerializer
 
-ACCOUNT_TYPE_URL = reverse('account:accounttype-list')
+ACCOUNT_TYPE_URL = reverse('accounts:accounttype-list')
 
 
 class PublicAccountTypeApiTests(TestCase):
