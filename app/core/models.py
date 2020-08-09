@@ -61,13 +61,18 @@ class Account(models.Model):
         return self.name
 
 
+class CATEGORY_TYPES(Enum):
+    INCOME = 'IN'
+    EXPENSE = 'EX'
+
+
 class TransactionCategory(models.Model):
     # Model for creating a transacion Category
     name = models.CharField(max_length=50)
     icon_name = models.CharField(max_length=50, blank=True)
     CATEGORY_TYPE_CHOICES = [
-        ('EX', _('Expense')),
-        ('IN', _('Income')),
+        (CATEGORY_TYPES.EXPENSE.value, _('Expense')),
+        (CATEGORY_TYPES.INCOME.value, _('Income')),
     ]
     category_type = models.CharField(
         max_length=5,

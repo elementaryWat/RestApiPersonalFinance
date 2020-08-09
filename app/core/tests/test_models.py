@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core import models
+from core.models import CATEGORY_TYPES
 
 
 def get_sample_user(email="sample_user@email.com", password="sample_password"):
@@ -75,19 +76,19 @@ class ModelTests(TestCase):
         self.assertEqual(account.account_type, payload['account_type'])
         self.assertEqual(account.user, payload['user'])
 
-    def test_create_account(self):
+    def test_create_category(self):
         # Test creating a new transaction Category
         user = get_sample_user()
         payload = {
-            'name': 'Transactions Account',
-            'description': 'Some description',
-            'account_type': account_type,
+            'name': 'Salary',
+            'icon_name': 'salary icon',
+            'category_type': CATEGORY_TYPES.INCOME.value,
             'user': user
         }
-        account = models.Account.objects.create(
+        category = models.TransactionCategory.objects.create(
             **payload
         )
-        self.assertEqual(account.name, payload['name'])
-        self.assertEqual(account.description, payload['description'])
-        self.assertEqual(account.account_type, payload['account_type'])
-        self.assertEqual(account.user, payload['user'])
+        self.assertEqual(category.name, payload['name'])
+        self.assertEqual(category.icon_name, payload['icon_name'])
+        self.assertEqual(category.category_type, payload['category_type'])
+        self.assertEqual(category.user, payload['user'])
