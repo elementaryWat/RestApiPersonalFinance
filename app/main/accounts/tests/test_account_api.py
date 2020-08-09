@@ -4,21 +4,14 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
-from core.models import Account, AccountType
+from core.models import Account, get_sample_account_type, get_sample_user
 from main.accounts.serializers import AccountSerializer
 
 ACCOUNTS_URL = reverse('accounts:accounts-list')
 
 
-def create_sample_account_type(payload={'name': 'account_testing', 'icon_name': 'testing'}):
-    return AccountType.objects.create(
-        **payload
-    )
-
-
-def get_sample_user(email="sample_user@email.com", password="sample_password"):
-    # Create a sample user
-    return get_user_model().objects.create_user(email, password)
+def get_detail_account_url(account):
+    return reverse('accounts:accounts-detail', args=(account.id,))
 
 
 class PublicAccountApiTests(TestCase):
@@ -36,6 +29,7 @@ class PrivateAccountApiTests(TestCase):
     # Test API requests that require authentication
     def setUp(self):
         self.client = APIClient()
+        self.account_type = get_sample_account_type()
         self.user = get_user_model().objects.create_user(
             email="testemail@test.com",
             password="test1234"
@@ -45,11 +39,10 @@ class PrivateAccountApiTests(TestCase):
 
     def test_retrieve_account_list(self):
         # Test for showing created accounts
-        account_type = create_sample_account_type()
         Account.objects.create(name="Account 1", description="description 1",
-                               account_type=account_type, user=self.user)
+                               account_type=self.account_type, user=self.user)
         Account.objects.create(name="Account 2", description="description 2",
-                               account_type=account_type, user=self.user)
+                               account_type=self.account_type, user=self.user)
 
         accounts = Account.objects.all().order_by('-name')
         serialized_accounts = AccountSerializer(accounts, many=True)
@@ -61,11 +54,10 @@ class PrivateAccountApiTests(TestCase):
     def test_retrieve_account_list_limited_to_user(self):
         # Test for showing created accounts for the logged in user
         another_user = get_sample_user()
-        account_type = create_sample_account_type()
         account1 = Account.objects.create(name="Account 1", description="description 1",
-                                          account_type=account_type, user=self.user)
+                                          account_type=self.account_type, user=self.user)
         Account.objects.create(name="Account 2", description="description 2",
-                               account_type=account_type, user=another_user)
+                               account_type=self.account_type, user=another_user)
 
         res = self.client.get(ACCOUNTS_URL)
 
@@ -75,11 +67,10 @@ class PrivateAccountApiTests(TestCase):
 
     def test_create_valid_account_success(self):
         # Test creating account with valid payload is successful
-        account_type = create_sample_account_type()
         payload = {
             'name': "Account 1",
             'description': "description 1",
-            'account_type': account_type.id,
+            'account_type': self.account_type.id,
         }
         res = self.client.post(ACCOUNTS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -98,7 +89,7 @@ class PrivateAccountApiTests(TestCase):
 
     def test_not_create_account_with_wrong_account_type(self):
         # Test not creating a category when the data is empty
-        WRONG_ACCOUNT_TYPE_ID = 5
+        WRONG_ACCOUNT_TYPE_ID = 6
         payload = {
             'name': "Account 1",
             'description': "description 1",
@@ -107,3 +98,40 @@ class PrivateAccountApiTests(TestCase):
 
         res = self.client.post(ACCOUNTS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_account_success(self):
+        # Test for updating accounts is successful
+        account_to_update = Account.objects.create(name="Account 1", description="description 1",
+                                                   account_type=self.account_type, user=self.user)
+        payload_partial_updated = {
+            'name': "Account change",
+            'description': "description change",
+        }
+
+        res = self.client.patch(get_detail_account_url(
+            account_to_update), payload_partial_updated)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        account_to_update.refresh_from_db()
+        self.assertEqual(account_to_update.name,
+                         payload_partial_updated['name'])
+        self.assertEqual(account_to_update.description,
+                         payload_partial_updated['description'])
+
+    def test_not_found_update_category_not_belonging_user(self):
+        # Test for not update account that not belongs the logged user
+        another_user = get_sample_user(
+            email="another@test.com",
+            password="test1234"
+        )
+        account_to_update = Account.objects.create(name="Account 1", description="description 1",
+                                                   account_type=self.account_type, user=another_user)
+        payload_partial_updated = {
+            'name': "Account change",
+            'description': "description change",
+        }
+
+        res = self.client.patch(get_detail_account_url(
+            account_to_update), payload_partial_updated)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)

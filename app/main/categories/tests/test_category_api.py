@@ -4,10 +4,14 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
-from core.models import TransactionCategory
+from core.models import TransactionCategory, get_sample_user, get_sample_account_type
 from main.categories.serializers import TransactionCategorySerializer
 
 CATEGORIES_URL = reverse('categories:transaction_category-list')
+
+
+def get_detail_category_url(category):
+    return reverse('categories:transaction_category-detail', args=(category.id,))
 
 
 class PublicAccountApiTests(TestCase):
@@ -36,7 +40,7 @@ class PrivateAccountApiTests(TestCase):
     # Test API requests that require authentication
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
+        self.user = get_sample_user(
             email="testemail@test.com",
             password="test1234"
         )
@@ -60,7 +64,7 @@ class PrivateAccountApiTests(TestCase):
 
     def test_retrieve_categories_list_limited_to_user(self):
         # Test for showing created categories for the logged in user
-        another_user = get_user_model().objects.create_user(
+        another_user = get_sample_user(
             email="another@test.com",
             password="test1234"
         )
@@ -76,7 +80,7 @@ class PrivateAccountApiTests(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], category2.name)
 
-    def test_create_valid_account_success(self):
+    def test_create_valid_category_success(self):
         # Test creating category with valid payload is successful
         payload = {
             'name': "Investments",
@@ -87,6 +91,45 @@ class PrivateAccountApiTests(TestCase):
         res = self.client.post(CATEGORIES_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data['user'], self.user.id)
+
+    def test_update_category_success(self):
+        # Test for updating created categories is successful
+        category_to_update = TransactionCategory.objects.create(name="Investments", icon_name="salary",
+                                                                category_type='IN', user=self.user)
+        payload_updated = {
+            'name': "My investments",
+            'icon_name': "invest",
+            'category_type': "IN",
+        }
+
+        res = self.client.put(get_detail_category_url(
+            category_to_update), payload_updated)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        category_to_update.refresh_from_db()
+        self.assertEqual(category_to_update.name, payload_updated['name'])
+        self.assertEqual(category_to_update.icon_name,
+                         payload_updated['icon_name'])
+
+    def test_not_found_update_category_not_belonging_user(self):
+        # Test for not update categories that not belongs the logged user
+        another_user = get_sample_user(
+            email="another@test.com",
+            password="test1234"
+        )
+
+        category_to_update = TransactionCategory.objects.create(name="Investments", icon_name="salary",
+                                                                category_type='IN', user=another_user)
+        payload_updated = {
+            'name': "My investments",
+            'icon_name': "invest",
+            'category_type': "IN",
+        }
+
+        res = self.client.put(get_detail_category_url(
+            category_to_update), payload_updated)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_not_create_category_with_empty_data(self):
         # Test not creating a category when the data is empty
