@@ -74,3 +74,20 @@ class ModelTests(TestCase):
         self.assertEqual(account.description, payload['description'])
         self.assertEqual(account.account_type, payload['account_type'])
         self.assertEqual(account.user, payload['user'])
+
+    def test_create_account(self):
+        # Test creating a new transaction Category
+        user = get_sample_user()
+        payload = {
+            'name': 'Transactions Account',
+            'description': 'Some description',
+            'account_type': account_type,
+            'user': user
+        }
+        account = models.Account.objects.create(
+            **payload
+        )
+        self.assertEqual(account.name, payload['name'])
+        self.assertEqual(account.description, payload['description'])
+        self.assertEqual(account.account_type, payload['account_type'])
+        self.assertEqual(account.user, payload['user'])

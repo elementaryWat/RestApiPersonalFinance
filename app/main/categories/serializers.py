@@ -6,4 +6,4 @@ class TransactionCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = TransactionCategory
         fields = ('id', 'name', 'icon_name', 'category_type', 'user',)
-        read_only_fields = ('id', )
+        read_only_fields = ('id', 'user')
