@@ -20,6 +20,17 @@ class PublicAccountApiTests(TestCase):
         res = self.client.get(CATEGORIES_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_not_create_category_when_not_logged(self):
+        # Test not creating a category when the user is not logged
+        payload = {
+            'name': "Investments",
+            'icon_name': "salary",
+            'category_type': "IN",
+        }
+
+        res = self.client.post(CATEGORIES_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class PrivateAccountApiTests(TestCase):
     # Test API requests that require authentication
@@ -64,3 +75,25 @@ class PrivateAccountApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], category2.name)
+
+    def test_not_create_category_with_empty_data(self):
+        # Test not creating a category when the data is empty
+        payload = {
+            'name': "",
+            'icon_name': "",
+            'category_type': "",
+        }
+
+        res = self.client.post(CATEGORIES_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_not_create_category_with_wrong_category(self):
+        # Test not creating a category when the data is empty
+        payload = {
+            'name': "Investments",
+            'icon_name': "salary",
+            'category_type': "wrong",
+        }
+
+        res = self.client.post(CATEGORIES_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
