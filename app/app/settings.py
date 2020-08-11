@@ -38,12 +38,22 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_nose',
     'rest_framework.authtoken',
     'core',
     'main.users',
     'main.categories',
-    'main.accounts'
+    'main.accounts',
+    'main.transactions'
 ]
+
+# Use nose to run all tests
+# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+# NOSE_ARGS = [
+#     '--with-coverage',
+#     '--cover-package=main.categories,main.accounts',
+# ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

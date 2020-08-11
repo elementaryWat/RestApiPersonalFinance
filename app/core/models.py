@@ -79,7 +79,7 @@ class CATEGORY_TYPES(Enum):
 
 
 class TransactionCategory(models.Model):
-    # Model for creating a transacion Category
+    # Model for creating a transaction Category
     name = models.CharField(max_length=50)
     icon_name = models.CharField(max_length=50, blank=True)
     CATEGORY_TYPE_CHOICES = [
@@ -92,5 +92,24 @@ class TransactionCategory(models.Model):
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return self.name + '_' + str(self.user.id)
+
+
+class Transaction(models.Model):
+    # Model for creating a transaction
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    description = models.CharField(max_length=250)
+    paid = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    category = models.ForeignKey(
+        TransactionCategory,
+        on_delete=models.CASCADE
+    )
+    account = models.ForeignKey(
+        Account,
         on_delete=models.CASCADE
     )
