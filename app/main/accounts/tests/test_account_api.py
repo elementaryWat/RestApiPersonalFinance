@@ -4,7 +4,8 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
-from core.models import Account, get_sample_account_type, get_sample_user
+from core.models import Account, AccountType
+
 from main.accounts.serializers import AccountSerializer
 
 ACCOUNTS_URL = reverse('accounts:accounts-list')
@@ -29,10 +30,22 @@ class PrivateAccountApiTests(TestCase):
     # Test API requests that require authentication
     def setUp(self):
         self.client = APIClient()
-        self.account_type = get_sample_account_type()
+
         self.user = get_user_model().objects.create_user(
             email="testemail@test.com",
             password="test1234"
+        )
+
+        self.payloadAnotherUser = {
+            'email': 'username@domain.com', 'password': 'Test1234'}
+        self.anotherUser = get_user_model().objects.create_user(
+            **self.payloadAnotherUser
+        )
+
+        self.payloadAccountType = {
+            'name': 'account_testing', 'icon_name': 'testing'}
+        self.accountType = AccountType.objects.create(
+            **self.payloadAccountType
         )
 
         self.client.force_authenticate(self.user)
@@ -40,9 +53,9 @@ class PrivateAccountApiTests(TestCase):
     def test_retrieve_account_list(self):
         # Test for showing created accounts
         Account.objects.create(name="Account 1", description="description 1",
-                               account_type=self.account_type, user=self.user)
+                               account_type=self.accountType, user=self.user)
         Account.objects.create(name="Account 2", description="description 2",
-                               account_type=self.account_type, user=self.user)
+                               account_type=self.accountType, user=self.user)
 
         accounts = Account.objects.all().order_by('-name')
         serialized_accounts = AccountSerializer(accounts, many=True)
@@ -53,11 +66,10 @@ class PrivateAccountApiTests(TestCase):
 
     def test_retrieve_account_list_limited_to_user(self):
         # Test for showing created accounts for the logged in user
-        another_user = get_sample_user()
         account1 = Account.objects.create(name="Account 1", description="description 1",
-                                          account_type=self.account_type, user=self.user)
+                                          account_type=self.accountType, user=self.user)
         Account.objects.create(name="Account 2", description="description 2",
-                               account_type=self.account_type, user=another_user)
+                               account_type=self.accountType, user=self.anotherUser)
 
         res = self.client.get(ACCOUNTS_URL)
 
@@ -70,7 +82,7 @@ class PrivateAccountApiTests(TestCase):
         payload = {
             'name': "Account 1",
             'description': "description 1",
-            'account_type': self.account_type.id,
+            'account_type': self.accountType.id,
         }
         res = self.client.post(ACCOUNTS_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -102,7 +114,7 @@ class PrivateAccountApiTests(TestCase):
     def test_update_account_success(self):
         # Test for updating accounts is successful
         account_to_update = Account.objects.create(name="Account 1", description="description 1",
-                                                   account_type=self.account_type, user=self.user)
+                                                   account_type=self.accountType, user=self.user)
         payload_partial_updated = {
             'name': "Account change",
             'description': "description change",
@@ -120,12 +132,8 @@ class PrivateAccountApiTests(TestCase):
 
     def test_not_found_update_category_not_belonging_user(self):
         # Test for not update account that not belongs the logged user
-        another_user = get_sample_user(
-            email="another@test.com",
-            password="test1234"
-        )
         account_to_update = Account.objects.create(name="Account 1", description="description 1",
-                                                   account_type=self.account_type, user=another_user)
+                                                   account_type=self.accountType, user=self.anotherUser)
         payload_partial_updated = {
             'name': "Account change",
             'description': "description change",

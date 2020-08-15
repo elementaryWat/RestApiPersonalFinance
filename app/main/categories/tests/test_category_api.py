@@ -1,10 +1,10 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
-from core.models import TransactionCategory, get_sample_user, get_sample_account_type
+from core.models import TransactionCategory
+from django.contrib.auth import get_user_model
 from main.categories.serializers import TransactionCategorySerializer
 
 CATEGORIES_URL = reverse('categories:transaction_category-list')
@@ -40,9 +40,14 @@ class PrivateAccountApiTests(TestCase):
     # Test API requests that require authentication
     def setUp(self):
         self.client = APIClient()
-        self.user = get_sample_user(
+        self.user = get_user_model().objects.create_user(
             email="testemail@test.com",
             password="test1234"
+        )
+        self.payloadAnotherUser = {
+            'email': 'username@domain.com', 'password': 'Test1234'}
+        self.anotherUser = get_user_model().objects.create_user(
+            **self.payloadAnotherUser
         )
 
         self.client.force_authenticate(self.user)
@@ -64,13 +69,8 @@ class PrivateAccountApiTests(TestCase):
 
     def test_retrieve_categories_list_limited_to_user(self):
         # Test for showing created categories for the logged in user
-        another_user = get_sample_user(
-            email="another@test.com",
-            password="test1234"
-        )
-
         TransactionCategory.objects.create(name="Investments", icon_name="salary",
-                                           category_type='IN', user=another_user)
+                                           category_type='IN', user=self.anotherUser)
         category2 = TransactionCategory.objects.create(name="Salary", icon_name="salary",
                                                        category_type='IN', user=self.user)
 
@@ -113,13 +113,8 @@ class PrivateAccountApiTests(TestCase):
 
     def test_not_found_update_category_not_belonging_user(self):
         # Test for not update categories that not belongs the logged user
-        another_user = get_sample_user(
-            email="another@test.com",
-            password="test1234"
-        )
-
         category_to_update = TransactionCategory.objects.create(name="Investments", icon_name="salary",
-                                                                category_type='IN', user=another_user)
+                                                                category_type='IN', user=self.anotherUser)
         payload_updated = {
             'name': "My investments",
             'icon_name': "invest",

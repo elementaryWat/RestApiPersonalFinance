@@ -4,28 +4,55 @@ from core import models
 from core.models import CATEGORY_TYPES
 
 
-def get_sample_user(email="sample_user@email.com", password="sample_password"):
-    # Create a sample user
-    return get_user_model().objects.create_user(email, password)
-
-
-def create_sample_account_type(payload={'name': 'account_testing', 'icon_name': 'testing'}):
-    return models.AccountType.objects.create(
-        **payload
-    )
-
-
 class ModelTests(TestCase):
+    def setUp(self):
+        self.payloadUser = {
+            'email': 'username@domain.com', 'password': 'Test1234'}
+        self.user = get_user_model().objects.create_user(
+            **self.payloadUser
+        )
+
+        self.payloadAccountType = {
+            'name': 'account_testing', 'icon_name': 'testing'}
+        self.accountType = models.AccountType.objects.create(
+            **self.payloadAccountType
+        )
+
+        self.payloadAccount = {
+            'name': 'Transactions Account',
+            'description': 'Some description',
+            'account_type': self.accountType,
+            'user': self.user
+        }
+        self.account = models.Account.objects.create(
+            **self.payloadAccount
+        )
+
+        self.payloadCategory = {
+            'name': 'Salary',
+            'icon_name': 'salary icon',
+            'category_type': CATEGORY_TYPES.INCOME.value,
+            'user': self.user
+        }
+        self.category = models.TransactionCategory.objects.create(
+            **self.payloadCategory
+        )
+
+        self.payloadTransaction = {
+            'amount': 200.0,
+            'description': 'New transaction',
+            'paid': True,
+            'category': self.category,
+            'account': self.account
+        }
+        self.transaction = models.Transaction.objects.create(
+            **self.payloadTransaction
+        )
+
     def test_create_user_with_email_successful(self):
         # Test creating a new user with an email is successful
-        email = "username@domain.com"
-        password = "Test1234"
-        user = get_user_model().objects.create_user(
-            email=email,
-            password=password
-        )
-        self.assertEqual(user.email, email)
-        self.assertTrue(user.check_password(password))
+        self.assertEqual(self.user.email, self.payloadUser['email'])
+        self.assertTrue(self.user.check_password(self.payloadUser['password']))
 
     def test_new_user_email_normalized(self):
         # Test the email for a new user is normalised
@@ -49,46 +76,40 @@ class ModelTests(TestCase):
 
     def test_create_account_type(self):
         # Test creating a new account type
-        payload = {
-            'name': 'account_testing',
-            'icon_name': 'testing icon'
-        }
-        account_type = create_sample_account_type(payload)
-        self.assertEqual(str(account_type), payload['name'])
-        self.assertEqual(account_type.name, payload['name'])
-        self.assertEqual(account_type.icon_name, payload['icon_name'])
+        self.assertEqual(str(self.accountType),
+                         self.payloadAccountType['name'])
+        self.assertEqual(self.accountType.name,
+                         self.payloadAccountType['name'])
+        self.assertEqual(self.accountType.icon_name,
+                         self.payloadAccountType['icon_name'])
 
     def test_create_account(self):
-        # Test creating a new account type
-        account_type = create_sample_account_type()
-        user = get_sample_user()
-        payload = {
-            'name': 'Transactions Account',
-            'description': 'Some description',
-            'account_type': account_type,
-            'user': user
-        }
-        account = models.Account.objects.create(
-            **payload
-        )
-        self.assertEqual(account.name, payload['name'])
-        self.assertEqual(account.description, payload['description'])
-        self.assertEqual(account.account_type, payload['account_type'])
-        self.assertEqual(account.user, payload['user'])
+        # Test creating a new account
+        self.assertEqual(self.account.name, self.payloadAccount['name'])
+        self.assertEqual(self.account.description,
+                         self.payloadAccount['description'])
+        self.assertEqual(self.account.account_type,
+                         self.payloadAccount['account_type'])
+        self.assertEqual(self.account.user, self.payloadAccount['user'])
 
     def test_create_category(self):
         # Test creating a new transaction Category
-        user = get_sample_user()
-        payload = {
-            'name': 'Salary',
-            'icon_name': 'salary icon',
-            'category_type': CATEGORY_TYPES.INCOME.value,
-            'user': user
-        }
-        category = models.TransactionCategory.objects.create(
-            **payload
-        )
-        self.assertEqual(category.name, payload['name'])
-        self.assertEqual(category.icon_name, payload['icon_name'])
-        self.assertEqual(category.category_type, payload['category_type'])
-        self.assertEqual(category.user, payload['user'])
+        self.assertEqual(self.category.name, self.payloadCategory['name'])
+        self.assertEqual(self.category.icon_name,
+                         self.payloadCategory['icon_name'])
+        self.assertEqual(self.category.category_type,
+                         self.payloadCategory['category_type'])
+        self.assertEqual(self.category.user, self.payloadCategory['user'])
+
+    def test_create_transaction(self):
+        # Test creating a new transaction
+        self.assertEqual(self.transaction.amount,
+                         self.payloadTransaction['amount'])
+        self.assertEqual(self.transaction.description,
+                         self.payloadTransaction['description'])
+        self.assertEqual(self.transaction.paid,
+                         self.payloadTransaction['paid'])
+        self.assertEqual(self.transaction.category,
+                         self.payloadTransaction['category'])
+        self.assertEqual(self.transaction.account,
+                         self.payloadTransaction['account'])

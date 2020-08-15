@@ -10,14 +10,15 @@ TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')
 
 
-def create_user(**args):
-    return get_user_model().objects.create_user(**args)
-
-
 class PublicUserApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        self.payloadUser = {
+            'email': 'username@domain.com', 'password': 'Test1234'}
+        self.user = get_user_model().objects.create_user(
+            **self.payloadUser
+        )
 
     def test_create_valid_user_success(self):
         # Test creating user with valid payload is successful
@@ -34,13 +35,7 @@ class PublicUserApiTests(TestCase):
 
     def test_create_existing_user(self):
         # Test creating an user that already exists fails
-        payload = {
-            'email': "testuser@normal.com",
-            'password': "anypassword",
-        }
-        create_user(**payload)
-
-        res = self.client.post(CREATE_USER_URL, payload)
+        res = self.client.post(CREATE_USER_URL, self.payloadUser)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_user_with_short_password(self):
@@ -57,24 +52,22 @@ class PublicUserApiTests(TestCase):
         ).exists()
         self.assertFalse(user_exists)
 
-    def test_create_token(self):
+    def test_create_token_successful(self):
         # Test creating a token for an existing user
         payload = {
-            'email': "testuser@domain.com",
-            'password': "validpassword",
+            'email': self.payloadUser['email'],
+            'password': self.payloadUser['password'],
         }
 
-        create_user(**payload)
         res = self.client.post(TOKEN_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn('token', res.data)
 
     def test_create_token_invalid_credentials(self):
         # Test that token is not created for invalid credentials
-        create_user(email="testuser@normal.com", password="validpassword")
         payload = {
-            'email': "testuser@domain.com",
-            'password': "invalidpassword",
+            'email': self.payloadUser['email'],
+            'password': 'invalidpassword',
         }
 
         res = self.client.post(TOKEN_URL, payload)
@@ -113,9 +106,10 @@ class PrivateUserApiTests(TestCase):
     # Test API requests that require authentication
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user(
-            email="testemail@test.com",
-            password="test1234"
+        self.payloadUser = {
+            'email': 'username@domain.com', 'password': 'Test1234'}
+        self.user = get_user_model().objects.create_user(
+            **self.payloadUser
         )
         self.client.force_authenticate(self.user)
 

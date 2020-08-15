@@ -2,7 +2,6 @@ from django.db import models
 from enum import Enum
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
     PermissionsMixin
-from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
@@ -25,11 +24,6 @@ class UserManager(BaseUserManager):
         return user
 
 
-def get_sample_user(email="sample_user@email.com", password="sample_password"):
-    # Create a sample user
-    return get_user_model().objects.create_user(email, password)
-
-
 class User(AbstractBaseUser, PermissionsMixin):
     # Custom user model that supports using email instead of username
     email = models.EmailField(max_length=255, unique=True)
@@ -39,12 +33,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
     USERNAME_FIELD = "email"
-
-
-def get_sample_account_type(payload={'name': 'account_testing', 'icon_name': 'testing'}):
-    return AccountType.objects.create(
-        **payload
-    )
 
 
 class AccountType(models.Model):
@@ -101,6 +89,7 @@ class TransactionCategory(models.Model):
 
 class Transaction(models.Model):
     # Model for creating a transaction
+    # TODO: Define currency field
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     description = models.CharField(max_length=250)
     paid = models.BooleanField(default=True)
