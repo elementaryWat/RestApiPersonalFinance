@@ -89,7 +89,7 @@ class PrivateAccountApiTests(TestCase):
         self.assertEqual(res.data['user'], self.user.id)
 
     def test_not_create_account_with_empty_data(self):
-        # Test not creating a category when the data is empty
+        # Test not creating an account when the data is empty
         payload = {
             'name': "",
             'description': "",
@@ -100,7 +100,7 @@ class PrivateAccountApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_not_create_account_with_wrong_account_type(self):
-        # Test not creating a category when the data is empty
+        # Test not creating an account when the data is empty
         WRONG_ACCOUNT_TYPE_ID = 6
         payload = {
             'name': "Account 1",

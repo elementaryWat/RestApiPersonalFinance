@@ -1,4 +1,4 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets
 
 from main.categories.serializers import TransactionCategorySerializer
 from core.models import TransactionCategory
