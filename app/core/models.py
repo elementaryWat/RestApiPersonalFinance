@@ -93,7 +93,7 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     description = models.CharField(max_length=250)
     paid = models.BooleanField(default=True)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
     category = models.ForeignKey(
         TransactionCategory,
         on_delete=models.CASCADE

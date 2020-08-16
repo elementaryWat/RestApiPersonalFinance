@@ -1,3 +1,21 @@
-from django.shortcuts import render
+from rest_framework import viewsets
 
-# Create your views here.
+from .serializers import TransactionSerializer
+from core.models import Transaction
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+
+class TransactionViewSet(viewsets.ModelViewSet):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    # def get_queryset(self):
+    #     # Return objects for the current authenticated user only
+    #     return self.queryset.filter(user=self.request.user)
+
+    # def perform_create(self, serializer):
+    #     # Adds the user logged in to the category
+    #     serializer.save(user=self.request.user)
