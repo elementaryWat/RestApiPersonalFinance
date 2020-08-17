@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
     PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+import datetime
 
 
 class UserManager(BaseUserManager):
@@ -93,7 +94,7 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     description = models.CharField(max_length=250)
     paid = models.BooleanField(default=True)
-    date_created = models.DateTimeField(auto_now_add=True, blank=True)
+    transaction_date = models.DateField(default=datetime.date.today)
     category = models.ForeignKey(
         TransactionCategory,
         on_delete=models.CASCADE

@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core import models
 from core.models import CATEGORY_TYPES
+import datetime
 
 
 class ModelTests(TestCase):
@@ -38,10 +39,12 @@ class ModelTests(TestCase):
             **self.payloadCategory
         )
 
+        self.DATE_TODAY = datetime.date.today()
         self.payloadTransaction = {
             'amount': 200.0,
             'description': 'New transaction',
             'paid': True,
+            'transaction_date': self.DATE_TODAY,
             'category': self.category,
             'account': self.account
         }

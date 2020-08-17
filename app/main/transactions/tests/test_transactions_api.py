@@ -4,8 +4,7 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from core.models import Transaction, Account, AccountType, TransactionCategory, CATEGORY_TYPES
-from datetime import datetime
-
+import datetime
 from main.transactions.serializers import TransactionSerializer
 
 TRANSACTIONS_URL = reverse('transactions:transactions-list')
@@ -15,7 +14,7 @@ def get_detail_transactions_url(transaction):
     return reverse('transactions:transactions-detail', args=(transaction.id,))
 
 
-class PublicAccountApiTests(APITestCase):
+class PublicTransactionApiTests(APITestCase):
 
     def test_retrieve_transactions_profile_not_authenticated(self):
         # Test authentication is required for retrieve user profile
@@ -23,7 +22,7 @@ class PublicAccountApiTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class PrivateAccountApiTests(APITestCase):
+class PrivateTransactionApiTests(APITestCase):
     # Test API requests that require authentication
     def setUp(self):
         self.payloadUser = {
@@ -58,10 +57,12 @@ class PrivateAccountApiTests(APITestCase):
             **self.payloadCategory
         )
 
+        self.DATE_TODAY = datetime.date.today()
         self.payloadTransaction = {
             'amount': 200.0,
             'description': 'New transaction',
             'paid': False,
+            'transaction_date': self.DATE_TODAY,
             'category': self.category,
             'account': self.account
         }
@@ -95,6 +96,7 @@ class PrivateAccountApiTests(APITestCase):
             'amount': 300.0,
             'description': 'New transaction 2',
             'paid': False,
+            'transaction_date': self.DATE_TODAY,
             'category': self.category,
             'account': self.account
         }
@@ -114,6 +116,7 @@ class PrivateAccountApiTests(APITestCase):
             'amount': 300.0,
             'description': 'New transaction 2',
             'paid': False,
+            'transaction_date': self.DATE_TODAY,
             'category': self.category.id,
             'account': self.account.id
         }
@@ -126,6 +129,7 @@ class PrivateAccountApiTests(APITestCase):
             'amount': '',
             'description': '',
             'paid': False,
+            'transaction_date': self.DATE_TODAY,
             'category': self.category.id,
             'account': self.account.id
         }
@@ -140,6 +144,7 @@ class PrivateAccountApiTests(APITestCase):
             'amount': 300.0,
             'description': 'New transaction 2',
             'paid': False,
+            'transaction_date': self.DATE_TODAY,
             'category': WRONG_CATEGORY_ID,
             'account': self.account.id
         }
@@ -153,6 +158,7 @@ class PrivateAccountApiTests(APITestCase):
             'amount': 300.0,
             'description': 'New transaction 2',
             'paid': False,
+            'transaction_date': self.DATE_TODAY,
             'category': self.category.id,
             'account': WRONG_ACCOUNT_ID
         }

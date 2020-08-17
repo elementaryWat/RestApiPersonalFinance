@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_nose',
+    'django_filters',
     'rest_framework.authtoken',
     'core',
     'main.users',
@@ -46,6 +47,10 @@ INSTALLED_APPS = [
     'main.accounts',
     'main.transactions'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
+}
 
 # Use nose to run all tests
 # TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

@@ -14,7 +14,7 @@ def get_detail_category_url(category):
     return reverse('categories:transaction_category-detail', args=(category.id,))
 
 
-class PublicAccountApiTests(TestCase):
+class PublicCategoryApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
@@ -36,7 +36,7 @@ class PublicAccountApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class PrivateAccountApiTests(TestCase):
+class PrivateCategoryApiTests(TestCase):
     # Test API requests that require authentication
     def setUp(self):
         self.client = APIClient()
