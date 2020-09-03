@@ -8,5 +8,5 @@ router.register('account_type', views.AccountTypeViewSet,
 router.register('', views.AccountViewSet, basename="accounts")
 
 urlpatterns = [
-    path('', include((router.urls, 'accounts'))),
+    path('', include((router.urls, ''))),
 ]
