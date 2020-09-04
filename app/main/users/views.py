@@ -14,7 +14,9 @@ class CreateUserView(generics.CreateAPIView):
         response = super().create(request, *args, **kwargs)
         token, created = Token.objects.get_or_create(
             user_id=response.data["id"])
-        response.data["token"] = str(token)
+        user = response.data
+        response.data = {'user': user}
+        response.data["auth_token"] = str(token)
         return response
 
 

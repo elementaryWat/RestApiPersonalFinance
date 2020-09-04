@@ -59,6 +59,13 @@ REST_FRAMEWORK = {
     ),
 }
 
+DJOSER = {
+    'SERIALIZERS': {
+        'current_user': 'main.users.serializers.UserSerializer',
+        'user_create': 'djoser.serializers.UserCreateSerializer'
+    },
+}
+
 # Use nose to run all tests
 # TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
