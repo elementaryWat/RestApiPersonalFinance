@@ -14,9 +14,9 @@ class TransactionViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     filterset_class = CustomTransactionFilter
 
-    # def get_queryset(self):
-    #     # Return objects for the current authenticated user only
-    #     return self.queryset.filter(user=self.request.user)
+    def get_queryset(self):
+        # Return objects for the current authenticated user only
+        return self.queryset.filter(category__user=self.request.user)
 
     # def perform_create(self, serializer):
     #     # Adds the user logged in to the category

@@ -3,7 +3,7 @@ from main.accounts import views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register('account_type', views.AccountTypeViewSet,
+router.register('account_types', views.AccountTypeViewSet,
                 basename="accounttype")
 router.register('', views.AccountViewSet, basename="accounts")
 
