@@ -244,7 +244,7 @@ class PrivateTransactionApiTests(APITestCase):
             **self.payloadCategory,
             'name': 'Another Category',
         }
-        another_category = TransactionCategory.objects.create(
+        another_category = TransactionCategory.create(
             **another_payload_category
         )
         transaction_oc_payload = {

@@ -28,6 +28,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     # Custom user model that supports using email instead of username
     email = models.EmailField(max_length=255, unique=True)
+    id_google = models.CharField(max_length=300, blank=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
@@ -71,6 +72,7 @@ class TransactionCategory(models.Model):
     # Model for creating a transaction Category
     name = models.CharField(max_length=50)
     icon_name = models.CharField(max_length=50, blank=True)
+    color = models.CharField(max_length=30, blank=True)
     CATEGORY_TYPE_CHOICES = [
         (CATEGORY_TYPES.EXPENSE.value, _('Expense')),
         (CATEGORY_TYPES.INCOME.value, _('Income')),

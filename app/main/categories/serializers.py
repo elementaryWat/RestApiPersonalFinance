@@ -8,5 +8,5 @@ class TransactionCategorySerializer(serializers.ModelSerializer):
         model = TransactionCategory
         # TODO: Add filter by logged user
         # list_serializer_class = FilteredListSerializerByUser
-        fields = ('id', 'name', 'icon_name', 'category_type', 'user',)
+        fields = ('id', 'name', 'icon_name', 'color', 'category_type', 'user',)
         read_only_fields = ('id', 'user')
